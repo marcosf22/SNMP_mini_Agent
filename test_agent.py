@@ -130,7 +130,7 @@ if __name__ == "__main__":
     print("=== TEST 2: SET valores modificables ===")
     asyncio.run(snmp_set(OIDS["manager"], "Marcos-Agente", OctetString))
     asyncio.run(snmp_set(OIDS["managerEmail"], "marcosfraile2004@gmail.com", OctetString))
-    asyncio.run(snmp_set(OIDS["cpuThreshold"], 5, Integer))
+    asyncio.run(snmp_set(OIDS["cpuThreshold"], 75, Integer))
     print()
 
     print("=== TEST 3: GET tras el SET ===")

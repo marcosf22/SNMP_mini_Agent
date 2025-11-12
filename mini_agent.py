@@ -209,6 +209,8 @@ async def cpu_sampler():
         over = cpu > thr
         if over and not last_over:
             send_trap()
+        elif not over and last_over:
+            print(f"[INFO] CPU back to normal: {cpu}% <= {thr}%")
         last_over = over
 
 # -------------------------

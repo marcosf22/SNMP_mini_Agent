@@ -21,7 +21,7 @@
       "oid": "1.3.6.1.4.1.28308.1.1.3.0",
       "type": "Gauge32",
       "access": "read-only",
-      "value": 10
+      "value": 5
     },
     "cpuThreshold": {
       "oid": "1.3.6.1.4.1.28308.1.1.4.0",
@@ -29,7 +29,7 @@
       "access": "read-write",
       "min_val": 1,
       "max_val": 100,
-      "value": 5
+      "value": 75
     }
   }
 }
