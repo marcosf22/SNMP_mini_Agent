@@ -1,16 +1,7 @@
+import asyncio, json, os, psutil, time, smtplib
+import ssl
 
-# mini_agent.py — SNMP mini-agent (pysnmp 7.1.4)
-# Author: Arturo
-# Date: 2025-11-10
-
-import asyncio
-import json
-import os
-import psutil
-import time
-import smtplib
 from email.message import EmailMessage
-
 from pysnmp.carrier.asyncio.dgram import udp
 from pysnmp.entity import engine, config
 from pysnmp.entity.rfc3413 import cmdrsp, ntforg
@@ -18,9 +9,7 @@ from pysnmp.proto.api import v2c
 
 JSON_FILE = "mib_state.json"
 
-# -------------------------
-#   JSON STATE MANAGEMENT
-# -------------------------
+# Gestion del almacenamiento JSON.
 class JsonStore:
     def __init__(self, filename):
         self.filename = filename
@@ -28,13 +17,13 @@ class JsonStore:
             with open(filename) as f:
                 self.model = json.load(f)
         else:
-            raise FileNotFoundError("Missing mib_state.json")
+            raise FileNotFoundError("El archivo de estado JSON no existe.")
 
-        # Build lookup map
+        # Construimos un mapa OID para acceder.
         self.oid_map = {tuple(map(int, v["oid"].split("."))): k
                         for k, v in self.model["scalars"].items()}
         self.sorted_oids = sorted(self.oid_map.keys())
-
+        
     def save(self):
         with open(self.filename, "w") as f:
             json.dump(self.model, f, indent=2)
@@ -46,7 +35,7 @@ class JsonStore:
             typ = self.model["scalars"][key]["type"]
             return True, self._to_snmp_type(val, typ)
         return False, None
-
+    
     def get_next(self, oid_tuple):
         for next_oid in self.sorted_oids:
             if next_oid > oid_tuple:
@@ -172,40 +161,36 @@ def send_trap():
 
     print(f"[TRAP] CPU {cpu}% exceeded threshold {thr}% -> sending trap & email")
 
-    ntfOrg = ntforg.NotificationOriginator()
-    errorIndication = ntfOrg.sendNotification(
-        snmpEngine,
-        "my-area",
-        None,
-        "",
-        "trap",
-        (
-            (v2c.ObjectIdentifier("1.3.6.1.4.1.28308.1.2.1"), v2c.Integer(1)),
-            (v2c.ObjectIdentifier("1.3.6.1.4.1.28308.1.1.3.0"), v2c.Integer(cpu)),
-            (v2c.ObjectIdentifier("1.3.6.1.4.1.28308.1.1.4.0"), v2c.Integer(thr)),
-            (v2c.ObjectIdentifier("1.3.6.1.4.1.28308.1.1.2.0"), v2c.OctetString(email.encode())),
-        ),
-    )
-
-    if errorIndication:
-        print("Trap send failed:", errorIndication)
-    else:
-        send_email(email, cpu, thr)
+    send_email(email, cpu, thr)
 
 
 def send_email(to_addr, cpu, thr):
+
+    remitente_email = "yankmar14@gmail.com"
+    remitente_pass = "slru bpcf ivbu vylv"
+    destinatario = to_addr
+    servidor_smtp = "smtp.gmail.com"
+    puerto_smtp = 465
+    cuerpo = f"Se ha superado el umbral de la cpu ({cpu}% > {thr}%)."
+
     msg = EmailMessage()
-    msg["Subject"] = "CPU Threshold Exceeded"
-    msg["From"] = "mini-agent@localhost"
-    msg["To"] = to_addr
-    msg.set_content(f"CPU usage exceeded threshold:\nCPU={cpu}% > Threshold={thr}%")
+    msg['Subject'] = "ALARMA CPU"
+    msg['From'] = remitente_email
+    msg['To'] = destinatario
+    msg.set_content(cuerpo)
 
     try:
-        with smtplib.SMTP("localhost", 1025) as s:
-            s.send_message(msg)
-        print(f"Email sent to {to_addr}")
+        context = ssl.create_default_context()
+            
+        with smtplib.SMTP_SSL(servidor_smtp, puerto_smtp, context=context) as server:
+            server.login(remitente_email, remitente_pass)
+            server.send_message(msg)
+            print("Correo de alarma enviado exitosamente")
+                
+    except smtplib.SMTPException as e:
+        print(f"Error de SMTP al enviar el correo: {e}")
     except Exception as e:
-        print(f"Email send failed: {e}")
+        print(f"Error inesperado: {e}")
 
 # -------------------------
 #   CPU MONITOR TASK

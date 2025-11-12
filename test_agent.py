@@ -2,10 +2,13 @@
 # Arturo (Network Management Course - Unizar)
 # --- test_agent.py ---
 
+import asyncio
 import time
 
+from pysnmp.hlapi.v3arch.asyncio import UdpTransportTarget
+
 # 1. Importar los componentes de la API de alto nivel (hlapi)
-from pysnmp.hlapi import (
+from pysnmp.hlapi.asyncio import (
     CommunityData,
     UdpTransportTarget,
     ContextData,
@@ -40,17 +43,18 @@ OIDS = {
 # FUNCIONES AUXILIARES
 # -------------------------------
 
-def snmp_get(oid, community=COMMUNITY_RO):
+async def snmp_get(oid, community=COMMUNITY_RO):
     """Ejecuta un SNMP GET y devuelve el valor."""
     # (Esta función ya era correcta, ahora funcionará con la importación corregida)
-    iterator = getCmd(
+    target = await UdpTransportTarget.create(('127.0.0.1', 161), timeout=1, retries=2)
+    errorIndication, errorStatus, errorIndex, varBinds = await getCmd(
         SnmpEngine(),
         CommunityData(community, mpModel=1),
-        UdpTransportTarget(AGENT, timeout=1, retries=2), # Esta línea ya no dará error
+        target, # Esta línea ya no dará error
         ContextData(),
         ObjectType(ObjectIdentity(oid))
     )
-    errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
+
     if errorIndication:
         print(f"[GET] Error: {errorIndication}")
         return None
@@ -62,17 +66,17 @@ def snmp_get(oid, community=COMMUNITY_RO):
             print(f"[GET] {oid.prettyPrint()} = {val.prettyPrint()}")
             return val.prettyPrint()
 
-def snmp_set(oid, value, type_tag, community=COMMUNITY_RW):
+async def snmp_set(oid, value, type_tag, community=COMMUNITY_RW):
     """Ejecuta un SNMP SET (solo RW community)."""
     # (Esta función ya era correcta)
-    iterator = setCmd(
+    target = await UdpTransportTarget.create(('127.0.0.1', 161), timeout=1, retries=2)
+    errorIndication, errorStatus, errorIndex, varBinds = await setCmd(
         SnmpEngine(),
         CommunityData(community, mpModel=1),
-        UdpTransportTarget(AGENT, timeout=1, retries=2),
+        target, # Esta línea ya no dará error
         ContextData(),
         ObjectType(ObjectIdentity(oid), type_tag(value))
     )
-    errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
     if errorIndication:
         print(f"[SET] Error: {errorIndication}")
     elif errorStatus:
@@ -84,39 +88,35 @@ def snmp_set(oid, value, type_tag, community=COMMUNITY_RW):
 # --- CORRECCIÓN 2: Lógica de WALK (GETNEXT) ---
 # La función snmp_getnext original no recorría el árbol.
 # Esta nueva función 'snmp_walk_subtree' lo hace correctamente.
-def snmp_walk_subtree(start_oid_str):
+async def snmp_walk_subtree(start_oid_str):
     """Realiza un SNMP WALK (usando GETNEXT) para recorrer un subárbol."""
     print(f"[WALK] Recorriendo subárbol: {start_oid_str}")
     
     # Objeto OID para comparar prefijos
     subtree_oid = ObjectIdentifier(start_oid_str)
-
-    iterator = nextCmd(
+    target = await UdpTransportTarget.create(('127.0.0.1', 161), timeout=1, retries=2)
+    errorIndication, errorStatus, errorIndex, varBinds = await nextCmd(
         SnmpEngine(),
         CommunityData(COMMUNITY_RO, mpModel=1),
-        UdpTransportTarget(AGENT, timeout=1, retries=2),
+        target,
         ContextData(),
         ObjectType(ObjectIdentity(start_oid_str)), # OID inicial
         lexicographicMode=False # Mantenemos tu configuración
     )
 
-    for (errorIndication, errorStatus, errorIndex, varBinds) in iterator:
-        if errorIndication:
-            print(f"  Error: {errorIndication}")
-            break
-        elif errorStatus:
-            print(f"  SNMP Error: {errorStatus.prettyPrint()} at {errorIndex}")
-            break
-        else:
-            # nextCmd devuelve un solo varBind
-            oid, val = varBinds[0] 
-            
-            # Comprobamos si el OID devuelto sigue dentro de nuestro subárbol
-            if not subtree_oid.isPrefixOf(oid):
-                print("  Fin del subárbol.")
-                break # Detiene el bucle
-            
-            print(f"  {oid.prettyPrint()} = {val.prettyPrint()}")
+    if errorIndication:
+        print(f"  Error: {errorIndication}")
+    elif errorStatus:
+        print(f"  SNMP Error: {errorStatus.prettyPrint()} at {errorIndex}")
+    else:
+        # nextCmd devuelve un solo varBind
+        oid, val = varBinds[0] 
+        
+        # Comprobamos si el OID devuelto sigue dentro de nuestro subárbol
+        if not subtree_oid.isPrefixOf(oid):
+            print("  Fin del subárbol.")
+        
+        print(f"  {oid.prettyPrint()} = {val.prettyPrint()}")
 
 # -------------------------------
 # SECUENCIA DE PRUEBAS
@@ -124,29 +124,29 @@ def snmp_walk_subtree(start_oid_str):
 if __name__ == "__main__":
     print("=== TEST 1: GET inicial ===")
     for name, oid in OIDS.items():
-        snmp_get(oid)
+        asyncio.run(snmp_get(oid))
     print()
 
     print("=== TEST 2: SET valores modificables ===")
-    snmp_set(OIDS["manager"], "Arturo-Agent", OctetString)
-    snmp_set(OIDS["managerEmail"], "test@unizar.es", OctetString)
-    snmp_set(OIDS["cpuThreshold"], 70, Integer)
+    asyncio.run(snmp_set(OIDS["manager"], "Marcos-Agente", OctetString))
+    asyncio.run(snmp_set(OIDS["managerEmail"], "marcosfraile2004@gmail.com", OctetString))
+    asyncio.run(snmp_set(OIDS["cpuThreshold"], 5, Integer))
     print()
 
     print("=== TEST 3: GET tras el SET ===")
     for name in ("manager", "managerEmail", "cpuThreshold"):
-        snmp_get(OIDS[name])
+        asyncio.run(snmp_get(OIDS[name]))
     print()
 
     print("=== TEST 4: WALK (recorrido del subtree) ===")
     # Llamamos a la nueva función de walk
-    snmp_walk_subtree("1.3.6.1.4.1.28308.1.1") 
+    asyncio.run(snmp_walk_subtree("1.3.6.1.4.1.28308.1.1"))
     print()
 
     print("=== TEST 5: CPU dinámico ===")
     print("Leyendo cpuUsage 3 veces (cada ~5s):")
     for _ in range(3):
-        snmp_get(OIDS["cpuUsage"])
+        asyncio.run(snmp_get(OIDS["cpuUsage"]))
         time.sleep(5)
 
     print("\n✅ Pruebas completadas.")
