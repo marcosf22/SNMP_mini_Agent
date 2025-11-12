@@ -1,0 +1,69 @@
+MYAGENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, experimental, Integer32, Gauge32
+        FROM SNMPv2-SMI
+    DisplayString, DateAndTime
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF;
+
+-- MIB Identifier
+myAgentMIB MODULE-IDENTITY
+    LAST-UPDATED "202511100000Z"
+    ORGANIZATION "Network Management Course - Zaragoza Network Management Research Group"
+    CONTACT-INFO "Instructor: Marcos, marcosfraile2004@gmail.com"
+    DESCRIPTION "MIB para un mini-agente que monitoriza el uso de la CPU y notifica en caso de sobrepasar un umbral."
+    REVISION "202511100000Z"
+    DESCRIPTION "Initial version based on Assignment 1 specifications."
+    -- Using experimental.9999 as a placeholder OID
+    ::= { enterprises 28308 1 } 
+
+-- Subtrees
+myAgentObjects          OBJECT IDENTIFIER ::= { myAgentMIB 1 }
+myAgentNotifications    OBJECT IDENTIFIER ::= { myAgentMIB 2 }
+
+-- -----------------------------------------------------------------------------
+-- Managed Objects (Scalars)
+-- -----------------------------------------------------------------------------
+
+manager OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Nombre del administrador de la red."
+    ::= { myAgentObjects 1 }
+
+managerEmail OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (3..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Email del administrador para recibir las notificaciones."
+    ::= { myAgentObjects 2 }
+
+cpuUsage OBJECT-TYPE
+    SYNTAX      Gauge32 (0..100) -- Using Gauge32 for non-negative, up-or-down value
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION "Uso actual de la CPU (%)."
+    ::= { myAgentObjects 3 }
+
+cpuThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (1..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Umbral de uso de la CPU (%) con el que se manda una notificación." 
+    ::= { myAgentObjects 4 }
+
+-- -----------------------------------------------------------------------------
+-- Notifications
+-- -----------------------------------------------------------------------------
+
+cpuOverThresholdNotification NOTIFICATION-TYPE
+    OBJECTS { cpuUsage, cpuThreshold, managerEmail } 
+    STATUS      current
+    DESCRIPTION "Generado cuando el uso de la CPU supera el umbral configurado."
+    ::= { myAgentNotifications 1 }
+
+
+END
