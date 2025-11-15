@@ -28,7 +28,7 @@
 
 _MIB_AGENT.mib compilado en MIB Browser._
 
-* **mib_state.json** Este archivo es la base de datos del agente. Almacena el valor actual de los objetos definidos en la mib. Cuando el agente se reincia, este archivo le permite recordar los valores que había configurado.
+* **mib_state.json** Este archivo es la base de datos del agente. Almacena el valor actual de los objetos definidos en la mib. Cuando el agente se reincia, este archivo le permite recordar los valores que había configurado. Se genera automáticamente al iniciar el agente por primera vez.
 
 * **mini_agent.py** Este es el programa principal que se ejecuta. Actúa como un servidor que se queda escuchando peticiones SNMP (GET, SET, GETNEXT) en el puerto 161. También inicia el monitor de CPU y es responsable de enviar las alertas (TRAP y email) cuando el umbral se supera.
 
