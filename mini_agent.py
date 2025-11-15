@@ -196,8 +196,8 @@ class JsonSet(cmdrsp.SetCommandResponder):
 
 # Función para enviar un correo electrónico con la alerta.
 def send_email(to_addr, cpu, thr):
-    remitente_email = "yankmar14@gmail.com"
-    remitente_pass = "slru bpcf ivbu vylv"
+    remitente_email = "PON AQUI TU EMAIL"
+    remitente_pass = "PON AQUI TU TOKEN DE APLICACION"
     destinatario = to_addr
     servidor_smtp = "smtp.gmail.com"
     puerto_smtp = 465
