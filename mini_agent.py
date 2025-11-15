@@ -18,13 +18,11 @@ class JsonStore:
     def __init__(self, filename):
         self.filename = filename
         try:
-            # 1. Intentar abrir y cargar el archivo
             with open(filename) as f:
                 self.model = json.load(f)
             print(f"Cargado estado existente desde {filename}")
 
         except FileNotFoundError:
-            # 2. Si no existe, crear el modelo por defecto
             print(f"ADVERTENCIA: {filename} no encontrado. Creando uno nuevo.")
             self.model = {
               "base_oid": "1.3.6.1.4.1.28308.1.1",
@@ -61,7 +59,6 @@ class JsonStore:
                 }
               }
             }
-            # 3. Guardar ese modelo por defecto en el disco
             self.save()
 
         # Construimos un mapa de OIDs.
@@ -407,3 +404,4 @@ try:
     loop.run_forever()
 except KeyboardInterrupt:
     print("Agent stopped.")
+
