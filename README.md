@@ -53,7 +53,7 @@ Sigue estos pasos para tener una copia local del proyecto funcionando.
 
 ### 2. Entorno de ejecución
 
-Para lanzar el agente, tienes que tener un directorio con los siguientes archivos:
+Para lanzar el agente, tienes que tener un directorio con los siguientes archivos (MIB_AGENT.mib no es necesario, solo para visualizarlo en un MIB Browser):
 
 <p align="center">
   <img src="./images/AGENTE.png" alt="Captura de pantalla 1" width="400"/>
