@@ -42,33 +42,40 @@ _Ejemplo ejecución test_agent.py._
 
 ---
 
-## 🚀 Cómo Empezar
+## 🚀 Cómo probarlo
 
 Sigue estos pasos para tener una copia local del proyecto funcionando.
 
 ### 1. Prerrequisitos
 
-* [Software 1 (ej: Python 3.10+)](https://www.python.org/)
-* [Software 2 (ej: pip)](https://pip.pypa.io/en/stable/installation/)
+* Python 3.10+ (https://www.python.org/)
+* Pysnmp 7.1.4 (https://pypi.org/project/pysnmp/7.1.4/)
 
-### 2. Instalación
+### 2. Entorno de ejecución
 
-1.  Clona el repositorio:
-    ```bash
-    git clone [https://github.com/tu-usuario/tu-proyecto.git](https://github.com/tu-usuario/tu-proyecto.git)
-    ```
-2.  Navega al directorio del proyecto:
-    ```bash
-    cd tu-proyecto
-    ```
-3.  Instala las dependencias:
-    ```bash
-    pip install -r requirements.txt
-    ```
+Para lanzar el agente, tienes que tener un directorio con los siguientes archivos:
+
+<p align="center">
+  <img src="./images/AGENTE.png" alt="Captura de pantalla 1" width="400"/>
+</p>
 
 ### 3. Ejecución
 
-Describe cómo ejecutar tu programa.
+1.  Instalar librería pysnmp:
+    ```bash
+    pip install pysnmp==7.1.4
+    ```
+2.  Navega al directorio del proyecto:
+    ```bash
+    cd mini-agent
+    ```
+3.  Inicia el mini_agent:
+    ```bash
+    python mini_agent.py
+    ```
+4.  Inicia el administrador/tester:
+    ```bash
+    python test_agent.py
+    ```
 
-```bash
-python mi_programa.py
+
