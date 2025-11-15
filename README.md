@@ -10,7 +10,7 @@
 
 ## 🌟 Las principales características del proyecto son:
 
-* MIB personalizada para gestionar la CPU (MIB_AGENT.mib).
+* MIB personalizada para monitorizar la CPU (MIB_AGENT.mib).
 * Soporte para operaciones SNMP (GET, GETNEXT, WALK, SET).
 * Monitorización activa de la CPU.
 * Sistema de alertas doble (Trap y Email).
