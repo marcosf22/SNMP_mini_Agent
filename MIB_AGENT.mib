@@ -12,7 +12,7 @@ IMPORTS
 myAgentMIB MODULE-IDENTITY
     LAST-UPDATED "202511100000Z"
     ORGANIZATION "Network Management Course - Zaragoza Network Management Research Group"
-    CONTACT-INFO "Instructor: Marcos, marcosfraile2004@gmail.com"
+    CONTACT-INFO "Instructor: Marcos, admin@gmail.com"
     DESCRIPTION "MIB para un mini-agente que monitoriza el uso de la CPU y notifica en caso de sobrepasar un umbral."
     REVISION "202511100000Z"
     DESCRIPTION "Initial version based on Assignment 1 specifications."
@@ -42,7 +42,7 @@ managerEmail OBJECT-TYPE
     ::= { myAgentObjects 2 }
 
 cpuUsage OBJECT-TYPE
-    SYNTAX      Gauge32 (0..100) -- Using Gauge32 for non-negative, up-or-down value
+    SYNTAX      Gauge32 (0..100)
     MAX-ACCESS  read-only 
     STATUS      current
     DESCRIPTION "Uso actual de la CPU (%)."
@@ -67,3 +67,4 @@ cpuOverThresholdNotification NOTIFICATION-TYPE
 
 
 END
+
