@@ -59,7 +59,15 @@ Para lanzar el agente, tienes que tener un directorio con los siguientes archivo
   <img src="./images/AGENTE.png" alt="Captura de pantalla 1" width="400"/>
 </p>
 
-### 3. Ejecución
+### 3. Modificar correo
+
+Para que los mensajes lleguen correctamente, tienes que obtener un token de aplicación para habilitar el envío automático desde el programa python.
+
+<p align="center">
+  <img src="./images/correo.png" alt="Captura de pantalla 1" width="400"/>
+</p>
+
+### 4. Ejecución
 
 1.  Instalar librería pysnmp:
     ```bash
