@@ -4,7 +4,7 @@
   <img src="https://media.tenor.com/McPQygGOuXYAAAAj/gladgers-hacker-gers-guardians-of-galaxy.gif" alt="Banner del Proyecto" width="150"/>
 </p>
 
-> Este proyecto es un agente SNMP que monitoriza la CPU y resuelve la necesidad de enviar alertas proactivas (TRAP y email) cuando esta supera un umbral, en lugar de requerir un sondeo manual.
+> Este proyecto es un agente SNMP que monitoriza la CPU y resuelve la necesidad de enviar alertas proactivas (TRAP y email) cuando ésta supera un umbral, en lugar de requerir un sondeo manual.
 
 ---
 
@@ -20,7 +20,7 @@
 
 ## 📁 Archivos necesarios:
 
-* **MIB_AGENT.mib** Este archivo define el agente. En él se establecen los OIDs que existen, que tipo de datos manejan y que notificaciones se pueden mandar. 
+* **MIB_AGENT.mib** Este archivo define el agente. En él se establecen los OIDs que existen, qué tipo de datos manejan y qué notificaciones se pueden mandar. 
 
 <p align="center">
   <img src="./images/mib_tree.png" alt="Captura de pantalla 1" width="400"/>
