@@ -17,11 +17,52 @@ class JsonStore:
     # Inicialización y carga del archivo JSON.
     def __init__(self, filename):
         self.filename = filename
-        if os.path.exists(filename):
+        try:
+            # 1. Intentar abrir y cargar el archivo
             with open(filename) as f:
                 self.model = json.load(f)
-        else:
-            raise FileNotFoundError("El archivo de estado JSON no existe.")
+            print(f"Cargado estado existente desde {filename}")
+
+        except FileNotFoundError:
+            # 2. Si no existe, crear el modelo por defecto
+            print(f"ADVERTENCIA: {filename} no encontrado. Creando uno nuevo.")
+            self.model = {
+              "base_oid": "1.3.6.1.4.1.28308.1.1",
+              "scalars": {
+                "manager": {
+                  "oid": "1.3.6.1.4.1.28308.1.1.1.0",
+                  "type": "DisplayString",
+                  "access": "read-write",
+                  "min_len": 1,
+                  "max_len": 64,
+                  "value": "NetAdmin (Default)"
+                },
+                "managerEmail": {
+                  "oid": "1.3.6.1.4.1.28308.1.1.2.0",
+                  "type": "DisplayString",
+                  "access": "read-write",
+                  "min_len": 3,
+                  "max_len": 128,
+                  "value": "admin@example.com"
+                },
+                "cpuUsage": {
+                  "oid": "1.3.6.1.4.1.28308.1.1.3.0",
+                  "type": "Gauge32",
+                  "access": "read-only",
+                  "value": 0
+                },
+                "cpuThreshold": {
+                  "oid": "1.3.6.1.4.1.28308.1.1.4.0",
+                  "type": "Integer32",
+                  "access": "read-write",
+                  "min_val": 1,
+                  "max_val": 100,
+                  "value": 90
+                }
+              }
+            }
+            # 3. Guardar ese modelo por defecto en el disco
+            self.save()
 
         # Construimos un mapa de OIDs.
         self.oid_map = {tuple(map(int, v["oid"].split("."))): k
@@ -196,8 +237,8 @@ class JsonSet(cmdrsp.SetCommandResponder):
 
 # Función para enviar un correo electrónico con la alerta.
 def send_email(to_addr, cpu, thr):
-    remitente_email = "PON AQUI TU EMAIL"
-    remitente_pass = "PON AQUI TU TOKEN DE APLICACION"
+    remitente_email = "yankmar14@gmail.com"
+    remitente_pass = "slru bpcf ivbu vylv"
     destinatario = to_addr
     servidor_smtp = "smtp.gmail.com"
     puerto_smtp = 465
