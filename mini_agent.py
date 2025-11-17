@@ -338,7 +338,7 @@ snmpEngine = engine.SnmpEngine()
 config.addTransport(
     snmpEngine,
     udp.DOMAIN_NAME + (1,),
-    udp.UdpTransport().openServerMode(("127.0.0.1", 161))
+    udp.UdpTransport().openServerMode(("0.0.0.0", 161))
 )
 config.addTransport(
     snmpEngine,
@@ -404,4 +404,5 @@ try:
     loop.run_forever()
 except KeyboardInterrupt:
     print("Agent stopped.")
+
 
